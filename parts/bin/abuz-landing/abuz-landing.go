@@ -1,8 +1,8 @@
 package main
 
 import (
-	"AbuzLandingChecker/bin/pkg/data"
-	"AbuzLandingChecker/bin/pkg/web"
+	"AbuzLandingChecker/parts/pkg/data"
+	"AbuzLandingChecker/parts/pkg/web"
 	"flag"
 	"fmt"
 	"github.com/go-chi/chi/v5"
