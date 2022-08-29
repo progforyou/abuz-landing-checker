@@ -24,7 +24,7 @@ var (
 )
 
 func init() {
-	flag.IntVar(&port, "port", 80, "set port")
+	flag.IntVar(&port, "port", 8080, "set port")
 	flag.Parse()
 }
 

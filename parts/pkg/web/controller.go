@@ -73,7 +73,7 @@ func quiz(db *gorm.DB, c *data.UsersController, w http.ResponseWriter, r *http.R
 	w.Header().Add("Content-Type", "text/html")
 
 	hashString := chi.URLParam(r, "hashString")
-	ip := "122.3.3.1"
+	ip := r.Header.Get("X-Real-IP")
 	UA := r.Header.Get("User-Agent")
 	err := c.UpdateIP(ip, hashString, UA)
 	if err != nil {
