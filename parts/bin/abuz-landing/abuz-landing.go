@@ -16,6 +16,7 @@ import (
 	"os"
 )
 
+// -build-me-for: native
 // -build-me-for: linux
 
 var (
@@ -32,7 +33,7 @@ func main() {
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: "15:04:05,000"}).Level(zerolog.DebugLevel)
 	log.Debug().Msgf("Start Telegram Blog server on port %d", port)
 
-	db, err := gorm.Open(sqlite.Open("database.db"), &gorm.Config{
+	db, err := gorm.Open(sqlite.Open("file:db.sqlite3?cache=shared"), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
 		Logger:                                   logger.Default.LogMode(logger.Warn),
 	})
