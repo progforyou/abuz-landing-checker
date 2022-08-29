@@ -67,6 +67,7 @@ func NewUsersController(db *gorm.DB, baseLog zerolog.Logger) UsersController {
 			}
 
 			if obj.IP == IP {
+				obj.GeneratedHash = hashString
 				obj.Count += 1
 				tx = db.Save(&obj)
 				if tx.Error != nil {
