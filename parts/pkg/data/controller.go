@@ -3,7 +3,6 @@ package data
 import (
 	"AbuzLandingChecker/parts/pkg/tools"
 	"errors"
-	"fmt"
 	"github.com/rs/zerolog"
 	"gorm.io/gorm"
 )
@@ -52,12 +51,6 @@ func NewUsersController(db *gorm.DB, baseLog zerolog.Logger) UsersController {
 			}
 
 			tx = db.Model(&Users{}).Find(&obj, "uniq_hash", hashString+IP)
-
-			fmt.Println("hashString+IP", hashString+IP)
-			fmt.Println("obj", obj.IP)
-			fmt.Println("obj", obj.ID)
-			fmt.Println("IP", IP)
-			fmt.Println("QWE", obj.IP == IP)
 
 			if obj.IP == "" {
 				obj.FP = UA
