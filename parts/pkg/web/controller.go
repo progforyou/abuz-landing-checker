@@ -4,7 +4,6 @@ import (
 	"AbuzLandingChecker/parts/pkg/data"
 	"bytes"
 	"embed"
-	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
@@ -19,6 +18,9 @@ var (
 	//go:embed "template/index.html"
 	indexTemplate []byte
 
+	//go:embed "template/create.html"
+	createTemplate []byte
+
 	//go:embed "template/admin.html"
 	adminTemplate []byte
 
@@ -26,8 +28,12 @@ var (
 	quizTemplate []byte
 )
 
-type AdminPage struct {
+type CreatePage struct {
 	Hash string
+}
+
+type AdminPage struct {
+	Data []data.Users
 }
 
 func NewController(db *gorm.DB, r *chi.Mux, c *data.UsersController) error {
@@ -38,7 +44,8 @@ func NewController(db *gorm.DB, r *chi.Mux, c *data.UsersController) error {
 		}
 	}
 	r.Get("/", wrap(index))
-	r.Get("/abuzadmincreatehash/spDdryEuGzeNulzOBgZHekfOI", wrap(admin))
+	r.Get("/abuzadmin/spDdryEuGzeNulzOBgZHekfOI", wrap(admin))
+	r.Get("/abuzadmincreatehash/spDdryEuGzeNulzOBgZHekfOI", wrap(createHash))
 	r.Get("/quiz/{hashString}", wrap(quiz))
 	r.Handle("/static/*", http.FileServer(http.FS(htmlStatic)))
 	return nil
@@ -51,18 +58,6 @@ func index(db *gorm.DB, c *data.UsersController, w http.ResponseWriter, r *http.
 
 	// Generate template
 	result, err := Render(indexTemplate, nil)
-
-	//ip := "122.3.3.3"
-
-	//check if exist
-	//var res data.Users
-	//tx := db.Model(&data.Users{}).Find(&res, "ip", ip)
-	/*if tx.RowsAffected == 0 {
-		return nil
-	}*/
-
-	fmt.Println("r.Header", r.Header.Get("User-Agent"))
-	//rowData := data.Users{FP: r.Header.Get("User-Agent")}
 
 	if err != nil {
 		w.WriteHeader(500)
@@ -77,7 +72,7 @@ func quiz(db *gorm.DB, c *data.UsersController, w http.ResponseWriter, r *http.R
 	w.Header().Add("Content-Type", "text/html")
 
 	hashString := chi.URLParam(r, "hashString")
-	ip := "122.3.3.2"
+	ip := "122.3.3.1"
 	UA := r.Header.Get("User-Agent")
 	err := c.UpdateIP(ip, hashString, UA)
 	if err != nil {
@@ -100,13 +95,37 @@ func quiz(db *gorm.DB, c *data.UsersController, w http.ResponseWriter, r *http.R
 	w.Write(result)
 }
 
-func admin(db *gorm.DB, c *data.UsersController, w http.ResponseWriter, r *http.Request) {
-	fmt.Println("HERE!")
+func createHash(db *gorm.DB, c *data.UsersController, w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "text/html")
 
 	log.Info().Msg("render page")
 	generatedHash, err := c.CreateHash()
-	dataPage := AdminPage{Hash: generatedHash}
+	dataPage := CreatePage{Hash: generatedHash}
+	if err != nil {
+		w.WriteHeader(500)
+		log.Error().Err(err).Msg("fail to create hash")
+		w.Write(([]byte)(err.Error()))
+		return
+	}
+
+	// Generate template
+	result, err := Render(createTemplate, dataPage)
+
+	if err != nil {
+		w.WriteHeader(500)
+		log.Error().Err(err).Msg("fail to render")
+		w.Write(([]byte)(err.Error()))
+		return
+	}
+	w.Write(result)
+}
+
+func admin(db *gorm.DB, c *data.UsersController, w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "text/html")
+
+	log.Info().Msg("render page")
+	allUsers, err := c.GetAll()
+	dataPage := AdminPage{Data: allUsers}
 	if err != nil {
 		w.WriteHeader(500)
 		log.Error().Err(err).Msg("fail to create hash")

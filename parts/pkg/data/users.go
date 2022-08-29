@@ -13,6 +13,7 @@ type Users struct {
 	FP            string         `gorm:"size:256" json:"fp"`
 	Count         uint64         `json:"count"`
 	IsAntik       bool           `json:"is-antik"`
+	UniqHash      string         `gorm:"size:100"`
 	CreatedAt     time.Time      `json:"-"`
 	UpdatedAt     time.Time      `json:"-"`
 	DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
