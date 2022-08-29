@@ -16,6 +16,8 @@ import (
 	"os"
 )
 
+// -build-me-for: linux
+
 var (
 	port int
 )
@@ -47,7 +49,8 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(httplog.RequestLogger(httpLogger))
 
-	err = web.NewController(db, r)
+	c := data.NewUsersController(db, httpLogger)
+	err = web.NewController(db, r, &c)
 	if err != nil {
 		log.Fatal().Err(err).Msg("fail create blog")
 	}
