@@ -11,6 +11,7 @@ type Users struct {
 	IP            string         `json:"ip"`
 	IPLocation    string         `json:"ip-location"`
 	FP            string         `gorm:"size:256" json:"fp"`
+	TelegramName  string         `gorm:"size:50"`
 	Count         uint64         `json:"count"`
 	IsAntik       bool           `json:"is-antik"`
 	UniqHash      string         `gorm:"size:100"`
