@@ -55,6 +55,7 @@ func NewUsersController(db *gorm.DB, baseLog zerolog.Logger) UsersController {
 			if obj.IP == "" {
 				obj.FP = UA
 				obj.IP = IP
+				obj.GeneratedHash = hashString
 				obj.UniqHash = hashString + IP
 				obj.Count = 1
 				tx = db.Save(&obj)
@@ -90,7 +91,7 @@ func NewUsersController(db *gorm.DB, baseLog zerolog.Logger) UsersController {
 		},
 		GetAll: func() ([]Users, error) {
 			var obj []Users
-			tx := db.Model(&Users{}).Find(&obj)
+			tx := db.Model(&Users{}).Order("generated_hash").Find(&obj)
 
 			if tx.Error != nil {
 				log.Error().Err(tx.Error).Msg("db error")
