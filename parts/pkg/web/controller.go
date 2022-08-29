@@ -37,7 +37,7 @@ type AdminPage struct {
 }
 
 func NewController(db *gorm.DB, r *chi.Mux, c *data.UsersController) error {
-	log.Info().Msg("create blog controller")
+	log.Info().Msg("create web controller")
 	wrap := func(f func(db *gorm.DB, c *data.UsersController, w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
 		return func(w http.ResponseWriter, r *http.Request) {
 			f(db, c, w, r)
@@ -53,8 +53,9 @@ func NewController(db *gorm.DB, r *chi.Mux, c *data.UsersController) error {
 
 func index(db *gorm.DB, c *data.UsersController, w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "text/html")
-
-	log.Info().Msg("render page")
+	realIP := r.Header.Get("X-Real-IP")
+	readAddress := r.Header.Get("X-Real-IP-Address")
+	log.Info().Str("Real IP", realIP).Str("readAddress", readAddress).Msg("render page")
 
 	// Generate template
 	result, err := Render(indexTemplate, nil)

@@ -31,7 +31,7 @@ func init() {
 func main() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: "15:04:05,000"}).Level(zerolog.DebugLevel)
-	log.Debug().Msgf("Start Telegram Blog server on port %d", port)
+	log.Debug().Msgf("Start server on port %d", port)
 
 	db, err := gorm.Open(sqlite.Open("file:db.sqlite3?cache=shared"), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
@@ -53,7 +53,7 @@ func main() {
 	c := data.NewUsersController(db, httpLogger)
 	err = web.NewController(db, r, &c)
 	if err != nil {
-		log.Fatal().Err(err).Msg("fail create blog")
+		log.Fatal().Err(err).Msg("fail create")
 	}
 
 	log.Debug().Msgf("start server on port %d", port)
