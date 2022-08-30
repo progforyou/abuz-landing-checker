@@ -37,9 +37,9 @@ func main() {
 
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	//for build
-	log.Logger = log.Output(f).Level(zerolog.DebugLevel)
+	//log.Logger = log.Output(f).Level(zerolog.DebugLevel)
 	//for debug
-	//log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: "15:04:05,000"}).Level(zerolog.DebugLevel)
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: "15:04:05,000"}).Level(zerolog.DebugLevel)
 
 	log.Debug().Msgf("Start server on port %d", port)
 
