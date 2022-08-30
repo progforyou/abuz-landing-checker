@@ -29,8 +29,18 @@ func init() {
 }
 
 func main() {
+	f, err := os.OpenFile("server.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal().Err(err)
+	}
+	defer f.Close()
+
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: "15:04:05,000"}).Level(zerolog.DebugLevel)
+	//for build
+	log.Logger = log.Output(f).Level(zerolog.DebugLevel)
+	//for debug
+	//log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: "15:04:05,000"}).Level(zerolog.DebugLevel)
+
 	log.Debug().Msgf("Start server on port %d", port)
 
 	db, err := gorm.Open(sqlite.Open("file:db.sqlite3?cache=shared"), &gorm.Config{
