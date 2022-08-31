@@ -7,31 +7,29 @@ import (
 	"os"
 )
 
-type UAArray []string
-
 type OSXFp struct {
-	Chrome UAArray
-	Safari UAArray
+	Chrome []string `json:"chrome"`
+	Safari []string `json:"safari"`
 }
 
 type LinuxFP struct {
-	Chrome UAArray
-	Opera  UAArray
+	Chrome []string `json:"chrome"`
+	Opera  []string `json:"opera"`
 }
 
 type WindowsFP struct {
-	Chrome UAArray
-	Edge   UAArray
-	Opera  UAArray
+	Chrome []string `json:"chrome"`
+	Edge   []string `json:"edge"`
+	Opera  []string `json:"opera"`
 }
 
 type FpData struct {
-	Linux   LinuxFP
-	Windows WindowsFP
-	Osx     OSXFp
+	Linux   LinuxFP   `json:"linux"`
+	Windows WindowsFP `json:"windows"`
+	Osx     OSXFp     `json:"osx"`
 }
 
-func (c UAArray) Check(ua string) bool {
+func Check(c []string, ua string) bool {
 	for _, s := range c {
 		if s == ua {
 			return true
@@ -40,37 +38,37 @@ func (c UAArray) Check(ua string) bool {
 	return false
 }
 
-func (f *LinuxFP) Check(ua string) bool {
+func CheckLin(f LinuxFP, ua string) bool {
 	var res bool
-	if res = f.Opera.Check(ua); res {
+	if res = Check(f.Opera, ua); res {
 		return true
 	}
-	if res = f.Chrome.Check(ua); res {
+	if res = Check(f.Chrome, ua); res {
 		return true
 	}
 	return false
 }
 
-func (f WindowsFP) Check(ua string) bool {
+func CheckWin(f WindowsFP, ua string) bool {
 	var res bool
-	if res = f.Opera.Check(ua); res {
+	if res = Check(f.Opera, ua); res {
 		return true
 	}
-	if res = f.Chrome.Check(ua); res {
+	if res = Check(f.Chrome, ua); res {
 		return true
 	}
-	if res = f.Edge.Check(ua); res {
+	if res = Check(f.Edge, ua); res {
 		return true
 	}
 	return false
 }
 
-func (f OSXFp) Check(ua string) bool {
+func CheckOsx(f OSXFp, ua string) bool {
 	var res bool
-	if res = f.Chrome.Check(ua); res {
+	if res = Check(f.Chrome, ua); res {
 		return true
 	}
-	if res = f.Safari.Check(ua); res {
+	if res = Check(f.Safari, ua); res {
 		return true
 	}
 	return false
@@ -78,7 +76,7 @@ func (f OSXFp) Check(ua string) bool {
 
 func CreateController() FpData {
 	var data FpData
-	jsonFile, err := os.Open("fp.json")
+	jsonFile, err := os.Open("./parts/pkg/fp/fp.json")
 
 	if err != nil {
 		log.Fatal().Err(err)
@@ -96,13 +94,13 @@ func CreateController() FpData {
 
 func (d *FpData) Check(ua string) bool {
 	var res bool
-	if res = d.Linux.Check(ua); res {
+	if res = CheckLin(d.Linux, ua); res {
 		return true
 	}
-	if res = d.Osx.Check(ua); res {
+	if res = CheckOsx(d.Osx, ua); res {
 		return true
 	}
-	if res = d.Windows.Check(ua); res {
+	if res = CheckWin(d.Windows, ua); res {
 		return true
 	}
 	return false
