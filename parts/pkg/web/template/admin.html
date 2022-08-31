@@ -11,7 +11,6 @@
 <table class="table" style="text-align: center; width: 100%; font-size: 15px;">
   <thead>
     <tr>
-      <th scope="col">ID</th>
       <th scope="col">IP address</th>
       <th scope="col">IP Location</th>
       <th scope="col">FP</th>
@@ -23,7 +22,6 @@
   <tbody>
   {{range $index, $element := .Data}}
     <tr>
-      <th scope="row">{{$element.ID}}</th>
       <td>{{$element.IP}}</td>
       <td>{{$element.IPLocation}}</td>
       <td>{{$element.FP}}</td>
