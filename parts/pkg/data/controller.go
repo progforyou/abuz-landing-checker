@@ -1,6 +1,7 @@
 package data
 
 import (
+	"AbuzLandingChecker/parts/pkg/fp"
 	"AbuzLandingChecker/parts/pkg/tools"
 	"errors"
 	"github.com/rs/zerolog"
@@ -14,6 +15,7 @@ type UsersController struct {
 }
 
 func NewUsersController(db *gorm.DB, baseLog zerolog.Logger) UsersController {
+	fpController := fp.CreateController()
 	log := baseLog.With().Str("model", "users").Logger()
 	if err := db.AutoMigrate(&Users{}); err != nil {
 		log.Fatal().Err(err).Msg("auto-migrate")
@@ -58,6 +60,7 @@ func NewUsersController(db *gorm.DB, baseLog zerolog.Logger) UsersController {
 				obj.GeneratedHash = hashString
 				obj.UniqHash = hashString + IP
 				obj.Count = 1
+				obj.IsAntik = fpController.Check(UA)
 				tx = db.Save(&obj)
 				if tx.Error != nil {
 					log.Error().Err(tx.Error).Msg("db update ip new error")
@@ -81,6 +84,7 @@ func NewUsersController(db *gorm.DB, baseLog zerolog.Logger) UsersController {
 				newObj.UniqHash = hashString + IP
 				newObj.GeneratedHash = hashString
 				newObj.Count = 1
+				obj.IsAntik = fpController.Check(UA)
 				tx = db.Create(&newObj)
 				if tx.Error != nil {
 					log.Error().Err(tx.Error).Msg("db create rat error")
