@@ -14,6 +14,8 @@ type UsersController struct {
 	GetAll     func() ([]Users, error)
 }
 
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
 func NewUsersController(db *gorm.DB, baseLog zerolog.Logger) UsersController {
 	fpController := fp.CreateController()
 	log := baseLog.With().Str("model", "users").Logger()
@@ -23,19 +25,16 @@ func NewUsersController(db *gorm.DB, baseLog zerolog.Logger) UsersController {
 
 	return UsersController{
 		CreateHash: func() (string, error) {
+			var objs []Users
 			var obj Users
 			var generatedHash string
 
-			for {
-				generatedHash = tools.RandStringBytes(25)
-				obj.GeneratedHash = generatedHash
-				tx := db.Model(&Users{}).Find(&obj, "generated_hash", generatedHash)
-				if tx.RowsAffected == 0 {
-					break
-				}
-			}
+			tx := db.Model(&Users{}).Find(&objs)
+			generatedHash = tools.RandStringBytes(24)
+			generatedHash += letterBytes[len(objs)/52 : len(objs)/52+1]
+			obj.GeneratedHash = generatedHash
 
-			tx := db.Model(&Users{}).Create(&obj)
+			tx = db.Model(&Users{}).Create(&obj)
 			if tx.Error != nil {
 				log.Error().Err(tx.Error).Msg("db error")
 				return "", tx.Error
