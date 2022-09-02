@@ -144,7 +144,8 @@ func quiz(db *gorm.DB, c *data.UsersController, w http.ResponseWriter, r *http.R
 	hashString := chi.URLParam(r, "hashString")
 	ip := r.Header.Get("X-Real-IP")
 	UA := r.Header.Get("User-Agent")
-	resp, err := http.Get("http: //ip-api.com/json/" + ip)
+	href := "http://ip-api.com/json/" + ip
+	resp, err := http.Get(href)
 	if err != nil {
 		log.Error().Err(err)
 		w.WriteHeader(500)
