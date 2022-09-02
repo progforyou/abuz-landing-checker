@@ -21,9 +21,6 @@ var (
 	//go:embed "template/index.html"
 	indexTemplate []byte
 
-	//go:embed "template/create.html"
-	createTemplate []byte
-
 	//go:embed "template/table.html"
 	tableTemplate []byte
 
@@ -67,10 +64,11 @@ func NewController(db *gorm.DB, r *chi.Mux, c *data.UsersController) error {
 			log.Error().Err(err).Msg("decode json")
 			return
 		}
+		ip := r.Header.Get("X-Real-IP")
 
 		if obj.Login == "admin" && obj.Password == "abuzadmin" {
 			rowObj := data.Admin{
-				IP:     obj.IP,
+				IP:     ip,
 				SignIn: true,
 			}
 			tx := db.Model(&data.Admin{}).Create(&rowObj)
@@ -285,7 +283,7 @@ func checkAdmin(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	var obj data.Admin
 	ip := r.Header.Get("X-Real-IP")
 	//#TODO FIX
-	ip = "46.61.42.11"
+	//ip = "95.153.160.248"
 	tx := db.Model(&data.Admin{}).Where("ip = ?", ip).Find(&obj)
 	if tx.RowsAffected == 0 {
 		http.Redirect(w, r, "/abuzadmin/signin", 302)
@@ -296,7 +294,7 @@ func checkAdminR(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	var obj data.Admin
 	ip := r.Header.Get("X-Real-IP")
 	//#TODO FIX
-	ip = "46.61.42.11"
+	//ip = "95.153.160.248"
 	tx := db.Model(&data.Admin{}).Where("ip = ?", ip).Find(&obj)
 	if tx.RowsAffected > 0 {
 		http.Redirect(w, r, "/abuzadmin/table", 302)
