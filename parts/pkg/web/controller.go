@@ -299,7 +299,7 @@ func checkAdmin(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	var obj data.Admin
 	ip := r.Header.Get("X-Real-IP")
 	//#TODO FIX
-	ip = "46.61.42.11"
+	//ip = "46.61.42.11"
 	tx := db.Model(&data.Admin{}).Where("ip = ?", ip).Find(&obj)
 	if tx.RowsAffected == 0 {
 		http.Redirect(w, r, "/abuzadmin/signin", 302)
@@ -310,7 +310,7 @@ func checkAdminR(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	var obj data.Admin
 	ip := r.Header.Get("X-Real-IP")
 	//#TODO FIX
-	ip = "46.61.42.11"
+	//ip = "46.61.42.11"
 	tx := db.Model(&data.Admin{}).Where("ip = ?", ip).Find(&obj)
 	if tx.RowsAffected > 0 {
 		http.Redirect(w, r, "/abuzadmin/table", 302)
