@@ -56,6 +56,10 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("fail to migrate database")
 	}
+	err = db.AutoMigrate(&data.Admin{})
+	if err != nil {
+		log.Fatal().Err(err).Msg("fail to migrate database")
+	}
 	httpLogger := log.With().Str("service", "http").Logger().Level(zerolog.InfoLevel)
 	r := chi.NewRouter()
 	r.Use(httplog.RequestLogger(httpLogger))

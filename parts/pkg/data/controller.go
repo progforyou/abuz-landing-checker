@@ -10,8 +10,10 @@ import (
 
 type UsersController struct {
 	CreateHash func() (string, error)
-	UpdateIP   func(IP, hashString, UA string) error
+	UpdateIP   func(IP, hashString, UA, city string) error
 	GetAll     func() ([]Users, error)
+	GetById    func(id int) (Users, error)
+	Save       func(obj Users) error
 }
 
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -41,7 +43,7 @@ func NewUsersController(db *gorm.DB, baseLog zerolog.Logger) UsersController {
 			}
 			return generatedHash, nil
 		},
-		UpdateIP: func(IP, hashString, UA string) error {
+		UpdateIP: func(IP, hashString, UA, city string) error {
 			var obj Users
 			var objCheck Users
 			tx := db.Model(&Users{}).Find(&objCheck, "generated_hash", hashString)
@@ -53,6 +55,7 @@ func NewUsersController(db *gorm.DB, baseLog zerolog.Logger) UsersController {
 
 			tx = db.Model(&Users{}).Find(&obj, "uniq_hash", hashString+IP)
 
+			obj.IPLocation = city
 			if objCheck.ID > 0 {
 				obj.TelegramName = objCheck.TelegramName
 			}
@@ -106,6 +109,24 @@ func NewUsersController(db *gorm.DB, baseLog zerolog.Logger) UsersController {
 				return nil, tx.Error
 			}
 			return obj, nil
+		},
+		GetById: func(id int) (Users, error) {
+			var obj Users
+			tx := db.Model(&Users{}).Where("id = ?", id).Find(&obj)
+
+			if tx.Error != nil {
+				log.Error().Err(tx.Error).Msg("db error")
+				return obj, tx.Error
+			}
+			return obj, nil
+		},
+		Save: func(obj Users) error {
+			tx := db.Save(&obj)
+			if tx.Error != nil {
+				log.Error().Err(tx.Error).Msg("db update ip error")
+				return tx.Error
+			}
+			return nil
 		},
 	}
 }
