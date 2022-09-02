@@ -37,11 +37,7 @@ var (
 	quizTemplate []byte
 )
 
-type CreatePage struct {
-	Hash string
-}
-
-type AdminPage struct {
+type TablePage struct {
 	Data []data.Users
 }
 
@@ -93,7 +89,7 @@ func NewController(db *gorm.DB, r *chi.Mux, c *data.UsersController) error {
 	})
 	r.Get("/abuzadmin/signin", wrap(signin))
 	r.Get("/abuzadmin/table", wrap(table))
-	r.Get("/abuzadmin/hash", wrap(createHash))
+	r.Get("/abuzadmin/api/createHash", wrap(createHash))
 	r.Get("/abuzadmin/edit/{id}", wrap(edit))
 	r.Post("/abuzadmin/api/edit", func(w http.ResponseWriter, r *http.Request) {
 		var obj data.Users
@@ -191,29 +187,18 @@ func quiz(db *gorm.DB, c *data.UsersController, w http.ResponseWriter, r *http.R
 }
 
 func createHash(db *gorm.DB, c *data.UsersController, w http.ResponseWriter, r *http.Request) {
-	w.Header().Add("Content-Type", "text/html")
 	checkAdmin(w, r, db)
 
 	log.Info().Msg("render page")
 	generatedHash, err := c.CreateHash()
-	dataPage := CreatePage{Hash: generatedHash}
+
 	if err != nil {
 		w.WriteHeader(500)
 		log.Error().Err(err).Msg("fail to create hash")
 		w.Write(([]byte)(err.Error()))
 		return
 	}
-
-	// Generate template
-	result, err := Render(createTemplate, dataPage)
-
-	if err != nil {
-		w.WriteHeader(500)
-		log.Error().Err(err).Msg("fail to render")
-		w.Write(([]byte)(err.Error()))
-		return
-	}
-	w.Write(result)
+	w.Write([]byte(generatedHash))
 }
 
 func table(db *gorm.DB, c *data.UsersController, w http.ResponseWriter, r *http.Request) {
@@ -230,7 +215,7 @@ func table(db *gorm.DB, c *data.UsersController, w http.ResponseWriter, r *http.
 		return
 	}
 
-	dataPage := AdminPage{Data: allUsers}
+	dataPage := TablePage{Data: allUsers}
 
 	// Generate template
 	result, err := Render(tableTemplate, dataPage)
@@ -300,7 +285,7 @@ func checkAdmin(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	var obj data.Admin
 	ip := r.Header.Get("X-Real-IP")
 	//#TODO FIX
-	//ip = "46.61.42.11"
+	ip = "46.61.42.11"
 	tx := db.Model(&data.Admin{}).Where("ip = ?", ip).Find(&obj)
 	if tx.RowsAffected == 0 {
 		http.Redirect(w, r, "/abuzadmin/signin", 302)
@@ -311,7 +296,7 @@ func checkAdminR(w http.ResponseWriter, r *http.Request, db *gorm.DB) {
 	var obj data.Admin
 	ip := r.Header.Get("X-Real-IP")
 	//#TODO FIX
-	//ip = "46.61.42.11"
+	ip = "46.61.42.11"
 	tx := db.Model(&data.Admin{}).Where("ip = ?", ip).Find(&obj)
 	if tx.RowsAffected > 0 {
 		http.Redirect(w, r, "/abuzadmin/table", 302)

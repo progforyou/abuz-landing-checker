@@ -36,15 +36,14 @@
         </nav>
         <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
           <div class="ms-md-auto pe-md-3 d-flex align-items-center">
-            <div class="input-group input-group-outline">
-              <label class="form-label">Type here...</label>
-              <input type="text" class="form-control">
-            </div>
+            <button type="button" id="create-btn" class="btn bg-gradient-primary w-100 my-4 mb-2" data-bs-toggle="modal" data-bs-target="#exampleModal">Create hash</button>
           </div>
         </div>
       </div>
     </nav>
     <!-- End Navbar -->
+
+
 
 
     <div class="container-fluid py-4">
@@ -117,6 +116,26 @@
     </div>
   </main>
 
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Hash</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <span id="create-hash-here">
+
+          </span>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="copy-hash">Copy hash</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!--   Core JS Files   -->
   <script src="/static/js/core/popper.min.js"></script>
   <script src="/static/js/core/bootstrap.min.js"></script>
@@ -130,6 +149,34 @@
       }
       Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
     }
+  </script>
+
+  <script>
+    var createHashBtn = document.querySelector('#create-btn');
+
+  createHashBtn.addEventListener('click', function(event) {
+    fetch("/abuzadmin/api/createHash").then(async r => {
+      const text = await r.text();
+      var copyTextarea = document.querySelector('#create-hash-here');
+      copyTextarea.innerText = "http://abuzlend.online/quiz/" + text;
+    }).catch(e => {
+      console.error(e)
+    })
+  });
+  </script>
+
+  <script>
+    var copyTextareaBtn = document.querySelector('#copy-hash');
+
+  copyTextareaBtn.addEventListener('click', function(event) {
+    var copyTextarea = document.querySelector('#create-hash-here');
+
+    try {
+      navigator.clipboard.writeText(copyTextarea.innerText);
+    } catch (err) {
+      console.log('Oops, unable to copy');
+    }
+  });
   </script>
   <!-- Github buttons -->
   <script async defer src="https://buttons.github.io/buttons.js"></script>
