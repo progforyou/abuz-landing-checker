@@ -53,6 +53,10 @@ func NewUsersController(db *gorm.DB, baseLog zerolog.Logger) UsersController {
 
 			tx = db.Model(&Users{}).Find(&obj, "uniq_hash", hashString+IP)
 
+			if objCheck.ID > 0 {
+				obj.TelegramName = objCheck.TelegramName
+			}
+
 			if obj.IP == "" {
 				obj.FP = UA
 				obj.IP = IP
